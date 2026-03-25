@@ -6,6 +6,20 @@ const EmojiPicker = lazy(() => import('emoji-picker-react'));
 
 const API_URL = 'https://chatgram-production.up.railway.app/api';
 
+const getInitials = (name) => name ? name.charAt(0).toUpperCase() : '?';
+
+const Avatar = ({ user, onClick, style = {}, title }) => {
+  return (
+    <div className="avatar" style={{ ...style, cursor: onClick ? 'pointer' : 'default' }} onClick={onClick} title={title}>
+      {user?.profile_pic ? (
+        <img src={`https://chatgram-production.up.railway.app${user.profile_pic}`} alt={user.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+      ) : (
+        getInitials(user?.name)
+      )}
+    </div>
+  );
+};
+
 function Chat({ currentUser, onLogout }) {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -270,21 +284,6 @@ function Chat({ currentUser, onLogout }) {
     } catch (err) { console.error('Error updating profile pic', err); }
   };
 
-  const Avatar = ({ user, onClick, style = {}, title }) => {
-    if (user?.profile_pic) {
-      return (
-        <img src={`https://chatgram-production.up.railway.app${user.profile_pic}`} alt="avatar" 
-             className="avatar" style={{ objectFit: 'cover', cursor: onClick ? 'pointer' : 'default', ...style }} 
-             onClick={onClick} title={title} />
-      );
-    }
-    return (
-      <div className="avatar" style={{ cursor: onClick ? 'pointer' : 'default', ...style }} onClick={onClick} title={title}>
-        {getInitials(user?.name)}
-      </div>
-    );
-  };
-
   const startCall = (type) => {
     if (!selectedUser) return;
     setCallType(type);
@@ -302,7 +301,6 @@ function Chat({ currentUser, onLogout }) {
     setReceivingCall(false);
     socket.emit('disconnect_call', { to: caller });
   };
-  const getInitials = (name) => name ? name.charAt(0).toUpperCase() : '?';
 
   return (
     <div className={`app-container ${selectedUser ? 'mobile-chat-open' : ''}`}>
