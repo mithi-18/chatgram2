@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { socket } from '../utils/socket';
 import VideoCall from './VideoCall';
-import EmojiPicker from 'emoji-picker-react';
+
+const EmojiPicker = lazy(() => import('emoji-picker-react'));
 
 const API_URL = 'https://chatgram-production.up.railway.app/api';
 
@@ -413,7 +414,9 @@ function Chat({ currentUser, onLogout }) {
             <form className="chat-input-area" onSubmit={sendMessage}>
               {showEmojiPicker && (
                 <div style={{position: 'absolute', bottom: '80px', left: '20px', zIndex: 100}}>
-                  <EmojiPicker onEmojiClick={(e) => setInputText(prev => prev + e.emoji)} theme="dark" />
+                  <Suspense fallback={<div style={{padding: '20px', background: 'var(--surface)', borderRadius: '10px'}}>Loading Emojis...</div>}>
+                    <EmojiPicker onEmojiClick={(e) => setInputText(prev => prev + e.emoji)} theme="dark" />
+                  </Suspense>
                 </div>
               )}
               <div className="input-pill">
